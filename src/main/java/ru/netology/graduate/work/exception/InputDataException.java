@@ -1,4 +1,4 @@
-package ru.netology.graduate.work.exeption;
+package ru.netology.graduate.work.exception;
 
 public class InputDataException extends RuntimeException {
 

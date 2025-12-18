@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.netology.graduate.work.exeption.UnauthorizedException;
+import ru.netology.graduate.work.exception.UnauthorizedException;
 import ru.netology.graduate.work.model.User;
 import ru.netology.graduate.work.repository.UserRepo;
 
