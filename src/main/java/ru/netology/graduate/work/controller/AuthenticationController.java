@@ -48,5 +48,4 @@ public class AuthenticationController {
         authenticationRepo.removeTokenAndUsernameByToken(token);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
 }

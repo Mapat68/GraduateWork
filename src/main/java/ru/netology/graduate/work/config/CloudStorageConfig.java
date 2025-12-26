@@ -20,13 +20,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import ru.netology.graduate.work.jwt.JwtRequestFilter;
 
 
-
 import java.util.List;
 
 
 @Configuration
 @EnableWebSecurity
-public class CloudStorageConfig  {
+public class CloudStorageConfig {
 
 
     private final JwtRequestFilter jwtRequestFilter;
@@ -43,8 +42,8 @@ public class CloudStorageConfig  {
     @Value("${cors.headers}")
     private String headers;
 
-    public CloudStorageConfig( JwtRequestFilter jwtRequestFilter) {
-                this.jwtRequestFilter = jwtRequestFilter;
+    public CloudStorageConfig(JwtRequestFilter jwtRequestFilter) {
+        this.jwtRequestFilter = jwtRequestFilter;
     }
 
     @Bean
@@ -58,13 +57,6 @@ public class CloudStorageConfig  {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-//@Bean
-//    public void addCorsMappings(CorsRegistry registry) {
-//    registry.addMapping("/**")
-//            .allowCredentials(true)
-//            .allowedOrigins("http://localhost:8081")
-//            .allowedMethods("*");
-//}
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -78,21 +70,21 @@ public class CloudStorageConfig  {
     }
 
 
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-    httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-    httpSecurity.cors(cors ->  cors.configurationSource(corsConfigurationSource()));
-    httpSecurity.authorizeHttpRequests(authorize -> authorize
-                       .requestMatchers("/h2-console/**").permitAll()
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        httpSecurity.authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/login").permitAll()
 
-            .anyRequest().authenticated())
-            .formLogin(Customizer.withDefaults())
-            .logout(config -> config
-                    .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login")) ;
+                        .anyRequest().authenticated())
+                .formLogin(Customizer.withDefaults())
+                .logout(config -> config
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login"));
 
-    return httpSecurity.build();
-}
+        return httpSecurity.build();
+    }
 }

@@ -7,19 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.netology.graduate.work.dto.request.EditFileNameRequest;
-import ru.netology.graduate.work.dto.response.FileResponse;
 import ru.netology.graduate.work.exception.InputDataException;
 import ru.netology.graduate.work.exception.UnauthorizedException;
 import ru.netology.graduate.work.model.StorageFile;
 import ru.netology.graduate.work.model.User;
-import ru.netology.graduate.work.repository.AuthenticationRepo;
 import ru.netology.graduate.work.repository.StorageFileRepo;
-import ru.netology.graduate.work.repository.UserRepo;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -27,11 +23,8 @@ import java.util.stream.Collectors;
 public class StorageFileService {
 
     private StorageFileRepo storageFileRepo;
-    private AuthenticationRepo authenticationRepo;
-    private UserRepo userRepo;
 
-    public boolean uploadFile(String authToken, String filename, MultipartFile file) {
-        final User user = getUserByAuthToken(authToken);
+    public boolean uploadFile(User user, String filename, MultipartFile file) {
         if (user == null) {
             log.error("Upload file: Unauthorized");
             throw new UnauthorizedException("Upload file: Unauthorized");
@@ -48,8 +41,7 @@ public class StorageFileService {
     }
 
     @Transactional
-    public void deleteFile(String authToken, String filename) {
-        final User user = getUserByAuthToken(authToken);
+    public void deleteFile(User user, String filename) {
         if (user == null) {
             log.error("Delete file: Unauthorized");
             throw new UnauthorizedException("Delete file: Unauthorized");
@@ -65,8 +57,7 @@ public class StorageFileService {
         log.info("Success delete file. User {}", user.getUsername());
     }
 
-    public byte[] downloadFile(String authToken, String filename) {
-        final User user = getUserByAuthToken(authToken);
+    public byte[] downloadFile(User user, String filename) {
         if (user == null) {
             log.error("Download file: Unauthorized");
             throw new UnauthorizedException("Download file: Unauthorized");
@@ -82,8 +73,7 @@ public class StorageFileService {
     }
 
     @Transactional
-    public void editFileName(String authToken, String filename, EditFileNameRequest editFileNameRequest) {
-        final User user = getUserByAuthToken(authToken);
+    public void editFileName(User user, String filename, EditFileNameRequest editFileNameRequest) {
         if (user == null) {
             log.error("Edit file name: Unauthorized");
             throw new UnauthorizedException("Edit file name: Unauthorized");
@@ -99,24 +89,12 @@ public class StorageFileService {
         log.info("Success edit file name. User {}", user.getUsername());
     }
 
-    public List<FileResponse> getAllFiles(String authToken, Integer limit) {
-        final User user = getUserByAuthToken(authToken);
+    public List<StorageFile> getAllFiles(User user, Integer limit) {
         if (user == null) {
             log.error("Get all files: Unauthorized");
             throw new UnauthorizedException("Get all files: Unauthorized");
         }
         log.info("Success get all files. User {}", user.getUsername());
-        return storageFileRepo.findAllByUser(user).stream()
-                .map(o -> new FileResponse(o.getFilename(), o.getSize()))
-                .collect(Collectors.toList());
-    }
-
-    private User getUserByAuthToken(String authToken) {
-        if (authToken.startsWith("Bearer ")) {
-            final String authTokenWithoutBearer = authToken.split(" ")[1];
-            final String username = authenticationRepo.getUsernameByToken(authTokenWithoutBearer);
-            return userRepo.findByUsername(username);
-        }
-        return null;
+        return storageFileRepo.findAllByUser(user);
     }
 }
